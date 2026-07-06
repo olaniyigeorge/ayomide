@@ -157,10 +157,10 @@ export const goalOptions = [
 ];
 
 export const contact = {
-  whatsapp: "https://wa.me/2340000000000", // replace with real number
-  phone: "+234 000 000 0000", // replace with real number
-  email: "hello@sculptprotocol.example", // replace with real email
-  instagram: "https://instagram.com/sculptprotocol", // replace with real handle
+  whatsapp: "https://wa.me/2349037018310", // replace with real number
+  phone: "+234 903 701 8310", // replace with real number
+  email: "olaniyigeorge77@gmail.com", // replace with real email
+  instagram: "https://instagram.com/olaniyi_george", // replace with real handle
 };
 
 export const disclaimer =
