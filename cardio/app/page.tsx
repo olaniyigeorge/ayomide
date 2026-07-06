@@ -117,7 +117,7 @@ export default function SculptProtocolPage() {
       <nav className="nav">
         <div className="wrap nav-row">
           <span className="nav-mark">
-            Sculpt <span>Protocol</span>™
+            Sculpt <span>Protocol</span>
           </span>
           <a className="nav-cta" href="#reach-us">
             Begin Assessment
@@ -130,18 +130,19 @@ export default function SculptProtocolPage() {
         <div className="wrap">
           <p className="hero-mark">File No. 07-WK · Body Recomposition</p>
           <h1 className="hero-title">
-            The Sculpt
+            The 7-Week
             <br />
-            Prot<em>o</em>col™
+            Sculpt <em>Journey</em>
           </h1>
+
           <p className="hero-sub">
-            A seven-week recomposition methodology built on structured
-            movement, progressive conditioning, and continuous monitoring -
-            not fad diets or routines you can't sustain past week two.
+            A structured 7-week transformation designed for consistency-first progress.
+            Built for home workouts, light outdoor movement, and gradual conditioning —
+            not extreme routines or unrealistic fitness demands.
           </p>
           <div className="hero-actions">
             <a className="btn-primary" href="#reach-us">
-              Begin Assessment
+              Start Her Journey
             </a>
             <a className="btn-ghost" href="#phases">
               View the Protocol
@@ -170,27 +171,51 @@ export default function SculptProtocolPage() {
         <div className="wrap">
           <div className="eyebrow">Overview</div>
           <h2 className="overview-title" data-reveal>
-            Every participant begins with a reading, not a guess. From there
-            the protocol adapts to <em>your</em> fitness level, your goals,
-            and your rate of progression.
+            This program is designed for someone starting from an inconsistent routine.
+            We begin with simple movement, then gradually build strength, tone, and
+            stamina — without overwhelming the body or mindset.
           </h2>
 
           <div className="overview-grid">
             <div className="outcome-cell" data-reveal>
-              <b>Composition</b>
-              Reduced body fat, a stronger midsection, fuller glutes.
+<b>Composition</b>
+Gradual fat reduction, improved waist definition, and glute activation through consistency.
             </div>
             <div className="outcome-cell" data-reveal>
-              <b>Capacity</b>
-              Increased stamina, cardiovascular fitness, muscular endurance.
+<b>Composition</b>
+Gradual fat reduction, improved waist definition, and glute activation through consistency.
             </div>
             <div className="outcome-cell" data-reveal>
-              <b>Carryover</b>
-              Better posture, functional strength, sustainable habits.
+<b>Carryover</b>
+A sustainable active lifestyle that fits travel, work, and real life.
             </div>
           </div>
         </div>
       </section>
+
+      <section className="section">
+      <div className="wrap">
+        <div className="eyebrow">Movement Style</div>
+        <h2 className="section-title">Built Around Real Life</h2>
+
+        <div className="overview-grid">
+          <div className="outcome-cell" data-reveal>
+            <b>Home Sessions</b>
+            Short structured workouts that don't require equipment or gym pressure.
+          </div>
+
+          <div className="outcome-cell" data-reveal>
+            <b>Outdoor Activity</b>
+            Walking, light jogging, and movement-based cardio sessions.
+          </div>
+
+          <div className="outcome-cell" data-reveal>
+            <b>Consistency Focus</b>
+            Designed to work even on low-energy or busy days.
+          </div>
+        </div>
+      </div>
+    </section>
 
       {/* ---------- PHASES (signature element) ---------- */}
       <section className="section" id="phases">
@@ -460,7 +485,7 @@ export default function SculptProtocolPage() {
       <footer className="footer">
         <div className="wrap">
           <div className="footer-row">
-            <span className="footer-mark">Sculpt Protocol™</span>
+            <span className="footer-mark">Sculpt Protocol</span>
             <span className="hero-mark" style={{ margin: 0 }}>
               © {new Date().getFullYear()}
             </span>

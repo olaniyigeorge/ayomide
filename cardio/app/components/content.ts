@@ -97,40 +97,46 @@ export const idealCandidate = [
 
 export const reviews = [
   {
-    name: "Lester O.",
+    name: "Lester A.",
     tag: "Week 7 · Lagos",
     quote:
-      "I honestly joined just for myself, but it ended up changing things at home too. My wife got into it with me, and now we actually train together, cook better, and spend more active time as a couple, it's improved our bond more than I expected 😉",
+      "I didn't think I could stay consistent at first, but the structure made it easy to follow. My energy improved, and I actually look forward to my sessions now.",
   },
   {
     name: "Laurel A.",
     tag: "Week 7 · Abuja",
     quote:
-      "I got my goddess body back. Dr George really broke everything down in a way that actually worked for my schedule. I feel stronger, softer in the right places, and way more confident in my skin.",
+      "This helped me get back into shape without feeling overwhelmed. My body feels tighter, my posture improved, and I finally feel confident again in my clothes.",
   },
   {
-    name: "Teyana T.",
+    name: "Tayena T.",
     tag: "Week 6 · Lagos",
     quote:
-      "The structure is what got me. It wasn't random workouts, it was progression. Every phase felt intentional, and my body responded exactly how they said it would.",
+      "What worked for me was how progressive everything was. Each week built on the last, and I could actually feel my body responding instead of guessing.",
+  },
+  {
+    name: "Bolu B.",
+    tag: "Week 5 · Lagos",
+    quote:
+      "I started this as someone inconsistent with workouts, but now movement feels normal. Even walking and light jogging became part of my routine.",
+  },
+  {
+    name: "Eniola B.",
+    tag: "Week 7 · Ibadan",
+    quote:
+      "My glutes, core, and stamina all improved gradually. Nothing felt rushed, and that made it easier to stay committed till the end.",
   },
   {
     name: "Nancy I.",
     tag: "Week 7 · Port Harcourt",
     quote:
-      "What stood out for me was consistency. Even on low-energy days, the plan was realistic enough to keep me moving without falling off completely.",
+      "Even on low-energy days, I never fell off completely. That balance between structure and flexibility is what kept me going.",
   },
   {
-    name: "Emeka U.",
-    tag: "Week 5 · Lagos",
+    name: "Goody T.",
+    tag: "Week 7 · Lagos",
     quote:
-      "I didn't expect my stamina to improve this much. Climbing stairs, long walks, even daily movement just feels easier now. It's a full lifestyle shift.",
-  },
-  {
-    name: "Sophie K.",
-    tag: "Week 7 · Abuja",
-    quote:
-      "The best part was how everything tied together, fitness, nutrition, recovery. Nothing felt isolated, and that made it easier to stay committed till the end.",
+      "This wasn't just workouts — it felt like a system. My lifestyle changed naturally without forcing extreme routines.",
   },
 ];
 
@@ -164,4 +170,4 @@ export const contact = {
 };
 
 export const disclaimer =
-  "The Sculpt Protocol™ is a fitness coaching and lifestyle program. It is not a medical treatment and is not intended to diagnose, treat, cure, or prevent any disease. Participants with underlying medical conditions should consult a qualified healthcare professional before beginning the program.";
+  "The Sculpt Protocol is a fitness coaching and lifestyle program. It is not a medical treatment and is not intended to diagnose, treat, cure, or prevent any disease. Participants with underlying medical conditions should consult a qualified healthcare professional before beginning the program.";
