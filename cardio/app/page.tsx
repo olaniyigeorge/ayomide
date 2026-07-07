@@ -1,18 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import {
-  profile,
-  phases,
-  monitoring,
-  nutrition,
-  idealCandidate,
-  reviews,
-  investment,
-  contact,
-  disclaimer,
-  offerings,
-} from "./components/content";
+import { useEffect, useState } from "react";
+import { profile, reviews, disclaimer, offerings } from "./components/content";
 import "./globals.css";
 import RollingNumber from "./components/rollingNumbers";
 import Link from "next/link";
@@ -59,15 +48,11 @@ type CheckInEntry = {
 export default function SculptProtocolPage() {
   useReveal();
 
-  const [activePhase, setActivePhase] = useState(-1);
-  const phaseRefs = useRef<Array<HTMLDivElement | null>>([]);
   const [checkIns, setCheckIns] = useState<CheckInEntry[]>([]);
-  
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // Fetch past check-ins on mount
   useEffect(() => {
     fetch("/api/checkin")
       .then((res) => (res.ok ? res.json() : { entries: [] }))
@@ -75,26 +60,9 @@ export default function SculptProtocolPage() {
       .catch(() => setCheckIns([]));
   }, []);
 
-  // Phase visibility tracker
-  useEffect(() => {
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          const idx = Number((entry.target as HTMLElement).dataset.phaseIndex);
-          if (entry.isIntersecting) {
-            setActivePhase((prev) => Math.max(prev, idx));
-          }
-        });
-      },
-      { threshold: 0.4, rootMargin: "0px 0px -15% 0px" }
-    );
-    phaseRefs.current.forEach((el) => el && io.observe(el));
-    return () => io.disconnect();
-  }, []);
-
-  // Consolidated & clean baseline submission handling
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const formEl = e.currentTarget; 
     setSubmitting(true);
     setError("");
     setSuccess("");
@@ -120,10 +88,9 @@ export default function SculptProtocolPage() {
       if (!res.ok) throw new Error("Something went wrong. Please try again.");
 
       const data = await res.json();
-      
+
       setSuccess("Got it - your baseline is set. We'll be in touch shortly.");
-      
-      // Update check-in UI immediately
+
       setCheckIns((prev) => [
         {
           _id: data.id || Math.random().toString(),
@@ -135,8 +102,8 @@ export default function SculptProtocolPage() {
         },
         ...prev,
       ]);
-      
-      e.currentTarget.reset();
+
+      formEl.reset();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
@@ -144,16 +111,17 @@ export default function SculptProtocolPage() {
     }
   }
 
-  const gaugeFillPct = activePhase < 0 ? 0 : ((activePhase + 1) / phases.length) * 100;
+  // Not yet rendered anywhere below - computed for an upcoming
+  // countdown/check-in log display.
   const latestCheckIn = checkIns[0];
-  const daysLeft = daysUntil(profile.travelDate || "2026-09-10"); // Fallback safety match for 9-week countdown
+  const daysLeft = daysUntil(profile.travelDate || "2026-09-10");
 
   return (
     <div className="sculpt">
       {/* ---------- NAVIGATION ---------- */}
       <nav className="nav">
         <div className="wrap nav-row">
-          <Link href="/ayo" className="nav-mark decoration-none">
+          <Link href="/ayo" className="nav-mark">
             Sculpt <span>Protocol</span>
           </Link>
           <a className="nav-cta" href="#signup">
@@ -164,12 +132,6 @@ export default function SculptProtocolPage() {
 
       {/* ---------- HERO SECTION ---------- */}
       <header className="hero-photo">
-        {/* Absolute Background & Layout Anchors */}
-        <div className="hero-photo-bg">
-          {/* If you have a separate ambient background photo, keep it here. Otherwise, leave it empty */}
-        </div>
-
-        {/* The yoga pose asset explicitly breaking out across the right side */}
         <div className="hero-absolute-portrait">
           <img src="/images/presh_yoga.png" alt="Ayomide elite training posture alignment" />
         </div>
@@ -189,8 +151,8 @@ export default function SculptProtocolPage() {
             <p className="hero-photo-sub">
               A structured, personalised 9-week transformation built around
               your body, schedule, and one clear deadline: touching down in
-              Gatwick feeling strong, confident, and ready - not rushed, with doubt or
-              overworked to get there.
+              Gatwick feeling strong, confident, and ready - not rushed, with
+              doubt, or overworked to get there.
             </p>
 
             <div className="hero-photo-actions">
@@ -226,8 +188,6 @@ export default function SculptProtocolPage() {
         </div>
       </header>
 
- 
-
       {/* ---------- CORE STRATEGY / OFFERINGS ---------- */}
       <section className="section" id="offerings">
         <div className="wrap">
@@ -247,35 +207,34 @@ export default function SculptProtocolPage() {
         </div>
       </section>
 
-{/* ---------- TARGETED VISUAL ZONE ---------- */}
+      {/* ---------- MADE FOR YOU (dark break) ---------- */}
       <section className="sculpt-showcase-section" id="made-for-you">
         <div className="wrap">
-          {/* Default to stacked (grid-cols-1), and split 50/50 on medium screens up (md:grid-cols-2) */}
-          <div className="flex flex-col border-2 border-red-400 md:flex-row items-center justify-between gap-8">
-            {/* Left Column: Content */}
+          <div className="showcase-grid">
             <div className="showcase-content">
               <h2 className="showcase-title">
                 Meticulous adjustments for a complex countdown.
               </h2>
               <p className="showcase-sub">
-                Every metabolic profile, workout set, macro breakdown, and progression plan is tracked live to force body recomposition safely without over-exhausting your energy limits before deployment.
+                Every metabolic profile, workout set, macro breakdown, and
+                progression plan is tracked live to force body recomposition
+                safely without over-exhausting your energy limits before
+                deployment.
               </p>
             </div>
-            
-            {/* Right Column: Contained Image */}
+
             <div className="showcase-image-wrapper">
-              <img 
-                src="/images/weird_presh.jpg" 
-                alt="Ayomide high-performance training focus" 
+              <img
+                src="/images/weird_presh.jpg"
+                alt="Ayomide high-performance training focus"
                 className="showcase-img"
               />
             </div>
-
           </div>
         </div>
       </section>
 
-                 {/* ---------- REVIEWS (sliding) ---------- */}
+      {/* ---------- REVIEWS (sliding) ---------- */}
       <section className="reviews">
         <div className="wrap">
           <div className="eyebrow">Proof It Works</div>
@@ -302,12 +261,13 @@ export default function SculptProtocolPage() {
         <div className="wrap">
           <div className="signup-grid">
             <div>
-
               <div className="signup-price-block">
                 <div className="signup-price-label">All-Inclusive Sculpt Investment</div>
                 <div className="signup-price-value">{formatNaira(120000)}</div>
                 <p className="signup-price-note">
-                  Covers biometrics analytics, tailored resistance metrics, bespoke meal planning consultancy, equipment acquisition advisory, and daily performance checks.
+                  Covers biometrics analytics, tailored resistance metrics,
+                  bespoke meal planning consultancy, equipment acquisition
+                  advisory, and daily performance checks.
                 </p>
               </div>
 
@@ -320,7 +280,6 @@ export default function SculptProtocolPage() {
               </ul>
             </div>
 
-            {/* Submissions Processing Card */}
             <div className="signup-card">
               <form onSubmit={handleSubmit}>
                 <p className="signup-baseline-note">
@@ -368,11 +327,9 @@ export default function SculptProtocolPage() {
         <div className="wrap">
           <div className="footer-row">
             <span className="footer-mark">Sculpt Protocol</span>
-            <span className="hero-mark" style={{ margin: 0 }}>
-              © {new Date().getFullYear()}
-            </span>
+            <span className="hero-mark">© {new Date().getFullYear()}</span>
           </div>
-          <p className="disclaimer">{disclaimer}</p>
+          <p className="disclaimer hidden">{disclaimer}</p>
         </div>
       </footer>
     </div>

@@ -22,7 +22,7 @@ export const offerings = {
       icon: "🔥",
       goal: "Lose weight & excess fat before your trip",
       remark:
-        "We're going to focus on helping you drop excess fat in a healthy, sustainable way — without crash diets or pushing your body into exhaustion. The goal is to help you feel lighter, more confident, and closer to the body you want before your journey.",
+        "We're going to focus on helping you drop excess fat in a healthy, sustainable way - without crash diets or pushing your body into exhaustion. The goal is to help you feel lighter, more confident, and closer to the body you want before your journey.",
     },
     {
       title: "Slimmer Waist & Flat Tummy Focus",
@@ -36,7 +36,7 @@ export const offerings = {
       icon: "💎",
       goal: "Reveal a sharper, more defined look",
       remark:
-        "As we reduce overall body fat, we'll work toward bringing out a more defined version of you — including helping reduce facial fullness and creating a leaner, more sculpted appearance while keeping you looking healthy and energized.",
+        "As we reduce overall body fat, we'll work toward bringing out a more defined version of you - including helping reduce facial fullness and creating a leaner, more sculpted appearance while keeping you looking healthy and energized.",
     },
     {
       title: "Glute Growth & Curves Sculpting",
@@ -57,7 +57,7 @@ export const offerings = {
       icon: "🎯",
       goal: "Transform without giving up the foods you love",
       remark:
-        "I'll personally guide you throughout the process — helping you make progress without extreme restrictions. We'll create a plan that fits your lifestyle, lets you still enjoy your favourite foods, and helps you transform in a way you can actually maintain.",
+        "I'll personally guide you throughout the process - helping you make progress without extreme restrictions. We'll create a plan that fits your lifestyle, lets you still enjoy your favourite foods, and helps you transform in a way you can actually maintain.",
     },
   ],
 };
