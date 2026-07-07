@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import {
+  profile,
   phases,
   monitoring,
   nutrition,
@@ -10,9 +11,11 @@ import {
   investment,
   contact,
   disclaimer,
-  goalOptions,
+  offerings,
 } from "./components/content";
 import "./globals.css";
+import RollingNumber from "./components/rollingNumbers";
+import Link from "next/link";
 
 /** Adds .is-visible to any element with data-reveal once it scrolls into view. */
 function useReveal() {
@@ -37,20 +40,42 @@ function formatNaira(n: number) {
   return `₦${n.toLocaleString("en-NG")}`;
 }
 
+function daysUntil(dateStr: string) {
+  const target = new Date(dateStr + "T00:00:00");
+  const now = new Date();
+  const diffMs = target.setHours(0, 0, 0, 0) - now.setHours(0, 0, 0, 0);
+  return Math.ceil(diffMs / 86_400_000);
+}
+
+type CheckInEntry = {
+  _id?: string;
+  weight: number;
+  waist: number;
+  glute: number;
+  note?: string;
+  createdAt?: string;
+};
+
 export default function SculptProtocolPage() {
   useReveal();
 
   const [activePhase, setActivePhase] = useState(-1);
   const phaseRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const [checkIns, setCheckIns] = useState<CheckInEntry[]>([]);
+  
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [selectedGoals, setSelectedGoals] = useState<string[]>([]);
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">(
-    "idle"
-  );
-  const [errorMsg, setErrorMsg] = useState("");
+  // Fetch past check-ins on mount
+  useEffect(() => {
+    fetch("/api/checkin")
+      .then((res) => (res.ok ? res.json() : { entries: [] }))
+      .then((data) => setCheckIns(data.entries || []))
+      .catch(() => setCheckIns([]));
+  }, []);
 
+  // Phase visibility tracker
   useEffect(() => {
     const io = new IntersectionObserver(
       (entries) => {
@@ -67,265 +92,194 @@ export default function SculptProtocolPage() {
     return () => io.disconnect();
   }, []);
 
-  function toggleGoal(goal: string) {
-    setSelectedGoals((prev) =>
-      prev.includes(goal) ? prev.filter((g) => g !== goal) : [...prev, goal]
-    );
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
+  // Consolidated & clean baseline submission handling
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setSubmitting(true);
+    setError("");
+    setSuccess("");
 
-    if (!name.trim() || !phone.trim() || selectedGoals.length === 0) {
-      setStatus("error");
-      setErrorMsg("Please add your name, phone number, and pick at least one goal.");
-      return;
-    }
-
-    setStatus("loading");
-    setErrorMsg("");
+    const form = new FormData(e.currentTarget);
+    const weightVal = Number(form.get("weight"));
+    const waistVal = Number(form.get("waist"));
+    const gluteVal = Number(form.get("glute"));
+    const noteVal = form.get("note")?.toString() || "";
 
     try {
-      const res = await fetch("/api/lead", {
+      const res = await fetch("/api/checkin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, phone, goals: selectedGoals }),
+        body: JSON.stringify({
+          weight: weightVal,
+          waist: waistVal,
+          glute: gluteVal,
+          note: noteVal,
+        }),
       });
 
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data?.error || "Something went wrong.");
-      }
+      if (!res.ok) throw new Error("Something went wrong. Please try again.");
 
-      setStatus("success");
-      setName("");
-      setPhone("");
-      setSelectedGoals([]);
+      const data = await res.json();
+      
+      setSuccess("Got it - your baseline is set. We'll be in touch shortly.");
+      
+      // Update check-in UI immediately
+      setCheckIns((prev) => [
+        {
+          _id: data.id || Math.random().toString(),
+          weight: weightVal,
+          waist: waistVal,
+          glute: gluteVal,
+          note: noteVal,
+          createdAt: new Date().toISOString(),
+        },
+        ...prev,
+      ]);
+      
+      e.currentTarget.reset();
     } catch (err) {
-      setStatus("error");
-      setErrorMsg(
-        err instanceof Error ? err.message : "Something went wrong. Please try again."
-      );
+      setError(err instanceof Error ? err.message : "Something went wrong.");
+    } finally {
+      setSubmitting(false);
     }
   }
 
-  const gaugeFillPct =
-    activePhase < 0 ? 0 : ((activePhase + 1) / phases.length) * 100;
+  const gaugeFillPct = activePhase < 0 ? 0 : ((activePhase + 1) / phases.length) * 100;
+  const latestCheckIn = checkIns[0];
+  const daysLeft = daysUntil(profile.travelDate || "2026-09-10"); // Fallback safety match for 9-week countdown
 
   return (
     <div className="sculpt">
+      {/* ---------- NAVIGATION ---------- */}
       <nav className="nav">
         <div className="wrap nav-row">
-          <span className="nav-mark">
+          <Link href="/ayo" className="nav-mark decoration-none">
             Sculpt <span>Protocol</span>
-          </span>
-          <a className="nav-cta" href="#reach-us">
-            Begin Assessment
+          </Link>
+          <a className="nav-cta" href="#signup">
+            Start Your Journey
           </a>
         </div>
       </nav>
 
-      {/* ---------- HERO ---------- */}
-      <header className="hero">
+      {/* ---------- HERO SECTION ---------- */}
+      <header className="hero-photo">
+        {/* Absolute Background & Layout Anchors */}
+        <div className="hero-photo-bg">
+          {/* If you have a separate ambient background photo, keep it here. Otherwise, leave it empty */}
+        </div>
+
+        {/* The yoga pose asset explicitly breaking out across the right side */}
+        <div className="hero-absolute-portrait">
+          <img src="/images/presh_yoga.png" alt="Ayomide elite training posture alignment" />
+        </div>
+
         <div className="wrap">
-          <p className="hero-mark">File No. 07-WK · Body Recomposition</p>
-          <h1 className="hero-title">
-            The 7-Week
-            <br />
-            Sculpt <em>Journey</em>
-          </h1>
+          <div className="hero-photo-content">
+            <span className="hero-badge">🔥 Made Specially For You, Ayomide</span>
 
-          <p className="hero-sub">
-            A structured 7-week transformation designed for consistency-first progress.
-            Built for home workouts, light outdoor movement, and gradual conditioning —
-            not extreme routines or unrealistic fitness demands.
-          </p>
-          <div className="hero-actions">
-            <a className="btn-primary" href="#reach-us">
-              Start Her Journey
-            </a>
-            <a className="btn-ghost" href="#phases">
-              View the Protocol
-            </a>
-          </div>
+            <h1 className="hero-photo-title">
+              SCULPT THE <em>BEST</em>
+              <br />
+              VERSION OF
+              <br />
+              YOURSELF
+            </h1>
 
-          <div className="readout" data-reveal>
-            <div className="readout-cell">
-              <div className="readout-label">Duration</div>
-              <div className="readout-value">7 Weeks</div>
+            <p className="hero-photo-sub">
+              A structured, personalised 9-week transformation built around
+              your body, schedule, and one clear deadline: touching down in
+              Gatwick feeling strong, confident, and ready - not rushed, with doubt or
+              overworked to get there.
+            </p>
+
+            <div className="hero-photo-actions">
+              <a className="btn-primary" href="#signup">
+                Start Training <span aria-hidden>→</span>
+              </a>
+              <a className="btn-ghost" href="#offerings">
+                View the Protocol
+              </a>
             </div>
-            <div className="readout-cell">
-              <div className="readout-label">Investment</div>
-              <div className="readout-value">₦120k – ₦150k</div>
-            </div>
-            <div className="readout-cell">
-              <div className="readout-label">Phases</div>
-              <div className="readout-value">I - V</div>
+
+            <div className="hero-photo-stats">
+              <div>
+                <div className="hero-stat-value">
+                  <RollingNumber value={36} delay={1.4} />"
+                </div>
+                <div className="hero-stat-label">Waist Goal</div>
+              </div>
+              <div>
+                <div className="hero-stat-value">
+                  <RollingNumber value={44} delay={1.4} />"
+                </div>
+                <div className="hero-stat-label">Glute Goal</div>
+              </div>
+              <div>
+                <div className="hero-stat-value">
+                  <RollingNumber value={84} delay={1.4} />kg
+                </div>
+                <div className="hero-stat-label">Weight Goal</div>
+              </div>
             </div>
           </div>
         </div>
       </header>
 
-      {/* ---------- OVERVIEW ---------- */}
-      <section className="section">
-        <div className="wrap">
-          <div className="eyebrow">Overview</div>
-          <h2 className="overview-title" data-reveal>
-            This program is designed for someone starting from an inconsistent routine.
-            We begin with simple movement, then gradually build strength, tone, and
-            stamina — without overwhelming the body or mindset.
-          </h2>
+ 
 
-          <div className="overview-grid">
-            <div className="outcome-cell" data-reveal>
-<b>Composition</b>
-Gradual fat reduction, improved waist definition, and glute activation through consistency.
-            </div>
-            <div className="outcome-cell" data-reveal>
-<b>Composition</b>
-Gradual fat reduction, improved waist definition, and glute activation through consistency.
-            </div>
-            <div className="outcome-cell" data-reveal>
-<b>Carryover</b>
-A sustainable active lifestyle that fits travel, work, and real life.
-            </div>
+      {/* ---------- CORE STRATEGY / OFFERINGS ---------- */}
+      <section className="section" id="offerings">
+        <div className="wrap">
+          <div className="eyebrow">TARGETED SPECIFICATIONS</div>
+          <h2 className="section-title">Program Architecture Built For Your Goals</h2>
+
+          <div className="goal-cards" style={{ marginTop: 48 }} data-reveal>
+            {offerings.options.map((option) => (
+              <div className="goal-card" key={option.title}>
+                <div className="goal-card-icon">{option.icon}</div>
+                <div className="goal-card-goal">{option.goal}</div>
+                <h3 className="goal-card-title">{option.title}</h3>
+                <p className="goal-card-remark">{option.remark}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      <section className="section">
-      <div className="wrap">
-        <div className="eyebrow">Movement Style</div>
-        <h2 className="section-title">Built Around Real Life</h2>
-
-        <div className="overview-grid">
-          <div className="outcome-cell" data-reveal>
-            <b>Home Sessions</b>
-            Short structured workouts that don't require equipment or gym pressure.
-          </div>
-
-          <div className="outcome-cell" data-reveal>
-            <b>Outdoor Activity</b>
-            Walking, light jogging, and movement-based cardio sessions.
-          </div>
-
-          <div className="outcome-cell" data-reveal>
-            <b>Consistency Focus</b>
-            Designed to work even on low-energy or busy days.
-          </div>
-        </div>
-      </div>
-    </section>
-
-      {/* ---------- PHASES (signature element) ---------- */}
-      <section className="section" id="phases">
+{/* ---------- TARGETED VISUAL ZONE ---------- */}
+      <section className="sculpt-showcase-section" id="made-for-you">
         <div className="wrap">
-          <div className="eyebrow">The Protocol</div>
-          <h2 className="section-title">Five Phases,
-            <br />
-            One Cycle
-          </h2>
-
-          <div className="phases-body" style={{ marginTop: 56 }}>
-            <div className="gauge" style={{ height: "calc(100% - 30px)" }}>
-              <div
-                className="gauge-fill"
-                style={{ height: `${gaugeFillPct}%` }}
+          {/* Default to stacked (grid-cols-1), and split 50/50 on medium screens up (md:grid-cols-2) */}
+          <div className="flex flex-col border-2 border-red-400 md:flex-row items-center justify-between gap-8">
+            {/* Left Column: Content */}
+            <div className="showcase-content">
+              <h2 className="showcase-title">
+                Meticulous adjustments for a complex countdown.
+              </h2>
+              <p className="showcase-sub">
+                Every metabolic profile, workout set, macro breakdown, and progression plan is tracked live to force body recomposition safely without over-exhausting your energy limits before deployment.
+              </p>
+            </div>
+            
+            {/* Right Column: Contained Image */}
+            <div className="showcase-image-wrapper">
+              <img 
+                src="/images/weird_presh.jpg" 
+                alt="Ayomide high-performance training focus" 
+                className="showcase-img"
               />
             </div>
-            <div className="phase-list">
-              {phases.map((phase, i) => (
-                <div
-                  key={phase.code}
-                  className={`phase-row ${
-                    i <= activePhase ? "is-active" : ""
-                  }`}
-                  data-phase-index={i}
-                  ref={(el) => {
-                    phaseRefs.current[i] = el;
-                  }}
-                  data-reveal
-                >
-                  <div className="phase-dot-col">
-                    <div className="phase-dot" />
-                  </div>
-                  <div>
-                    <div className="phase-head">
-                      <span className="phase-numeral">{phase.numeral}</span>
-                      <span className="phase-code">{phase.code}</span>
-                    </div>
-                    <h3 className="phase-title">{phase.title}</h3>
-                    <p className="phase-summary">{phase.summary}</p>
-                    <div className="phase-tags">
-                      {phase.items.map((item) => (
-                        <span className="phase-tag" key={item}>
-                          {item}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+
           </div>
         </div>
       </section>
 
-      {/* ---------- MONITORING / NUTRITION ---------- */}
-      <section className="section">
-        <div className="wrap">
-          <div className="eyebrow">Support Systems</div>
-          <h2 className="section-title">Tracked &amp; Fuelled</h2>
-
-          <div className="panels" style={{ marginTop: 48 }} data-reveal>
-            <div className="panel">
-              <div className="panel-title">Performance Monitoring</div>
-              <ul className="panel-list">
-                {monitoring.map((m) => (
-                  <li key={m}>{m}</li>
-                ))}
-              </ul>
-            </div>
-            <div className="panel">
-              <div className="panel-title">Nutritional Support</div>
-              <ul className="panel-list">
-                {nutrition.map((n) => (
-                  <li key={n}>{n}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ---------- VISUAL LOG (before / after) ---------- */}
-      <section className="section">
-        <div className="wrap">
-          <div className="eyebrow">Visual Log</div>
-          <h2 className="section-title">Now &amp; Then</h2>
-          <p className="hero-sub" style={{ marginTop: 14, marginBottom: 40 }}>
-            Progress photographs are part of every participant's file. Swap
-            these placeholders for real client images when ready.
-          </p>
-
-          <div className="photo-gallery" data-reveal>
-            <div className="photo-frame">
-              <span className="photo-frame-tag">Before</span>
-              <img src="/images/before.jpg" alt="Before" />
-            </div>
-            <div className="photo-frame">
-              <span className="photo-frame-tag">After</span>
-              <img src="/images/after.jpg" alt="After" />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ---------- REVIEWS (sliding) ---------- */}
+                 {/* ---------- REVIEWS (sliding) ---------- */}
       <section className="reviews">
         <div className="wrap">
-          <div className="eyebrow">Participant Logs</div>
-          <h2 className="section-title">In Their Words</h2>
+          <div className="eyebrow">Proof It Works</div>
+          <h2 className="section-title">Others On This Protocol</h2>
         </div>
 
         <div className="marquee" style={{ marginTop: 48 }}>
@@ -343,139 +297,67 @@ A sustainable active lifestyle that fits travel, work, and real life.
         </div>
       </section>
 
-      {/* ---------- IDEAL CANDIDATE ---------- */}
-      <section className="section">
+      {/* ---------- PRIVATE ONBOARDING & PRICING ---------- */}
+      <section className="signup-section" id="signup">
         <div className="wrap">
-          <div className="eyebrow">Is This For You</div>
-          <h2 className="section-title">Ideal Candidate</h2>
-          <div
-            className="candidate-list"
-            style={{ marginTop: 32 }}
-            data-reveal
-          >
-            {idealCandidate.map((c) => (
-              <span className="candidate-chip" key={c}>
-                {c}
-              </span>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ---------- PRICING ---------- */}
-      <section className="section">
-        <div className="wrap">
-          <div className="eyebrow">Investment</div>
-          <h2 className="section-title">Comprehensive 7-Week Program</h2>
-
-          <div className="price-card" style={{ marginTop: 40 }} data-reveal>
+          <div className="signup-grid">
             <div>
-              <div className="price-figure">
-                {formatNaira(investment.low)} – {formatNaira(investment.high)}
+
+              <div className="signup-price-block">
+                <div className="signup-price-label">All-Inclusive Sculpt Investment</div>
+                <div className="signup-price-value">{formatNaira(120000)}</div>
+                <p className="signup-price-note">
+                  Covers biometrics analytics, tailored resistance metrics, bespoke meal planning consultancy, equipment acquisition advisory, and daily performance checks.
+                </p>
               </div>
-              <div className="price-note">
-                One-time investment for the full seven-week cycle.
-              </div>
-              <ul className="price-includes">
-                {investment.includes.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
+
+              <ul className="signup-list">
+                <li><span className="signup-check">✓</span> High-Tier Fitness Biometric Blueprint</li>
+                <li><span className="signup-check">✓</span> Personalized Dynamic Training Split</li>
+                <li><span className="signup-check">✓</span> Targeted Structural Glute & Waist Isolation</li>
+                <li><span className="signup-check">✓</span> De-inflammation Sourcing & Nutrition Concierge</li>
+                <li><span className="signup-check">✓</span> Comprehensive Progress Adjustments & Session Logistics</li>
               </ul>
             </div>
-            <a className="btn-primary" href="#reach-us">
-              Begin Assessment
-            </a>
-          </div>
-        </div>
-      </section>
 
-      {/* ---------- REACH US ---------- */}
-      <section className="section" id="reach-us">
-        <div className="wrap">
-          <div className="eyebrow">Reach Us</div>
-          <h2 className="section-title">Start Your File</h2>
-
-          <div className="contact-grid" style={{ marginTop: 48 }}>
-            <form onSubmit={handleSubmit} data-reveal noValidate>
-              <div className="form-row">
-                <label htmlFor="name">Full name</label>
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  placeholder="Your name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </div>
-              <div className="form-row">
-                <label htmlFor="phone">Phone number</label>
-                <input
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  placeholder="080..."
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                />
-              </div>
-              <div className="form-row">
-                <label>Goals (select all that apply)</label>
-                <div className="checkbox-grid">
-                  {goalOptions.map((goal) => (
-                    <label className="checkbox-chip" key={goal}>
-                      <input
-                        type="checkbox"
-                        checked={selectedGoals.includes(goal)}
-                        onChange={() => toggleGoal(goal)}
-                      />
-                      <span>{goal}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-              <button
-                className="submit-btn"
-                type="submit"
-                disabled={status === "loading"}
-              >
-                {status === "loading" ? "Sending..." : "Request Assessment"}
-              </button>
-              {status === "success" && (
-                <p className="submit-note">
-                  Received! We'll reach out to schedule your baseline
-                  assessment.
+            {/* Submissions Processing Card */}
+            <div className="signup-card">
+              <form onSubmit={handleSubmit}>
+                <p className="signup-baseline-note">
+                  Supply current metric baselines to generate your initial dashboard values.
                 </p>
-              )}
-              {status === "error" && (
-                <p className="submit-note submit-note-error">{errorMsg}</p>
-              )}
-            </form>
 
-            <div className="contact-direct">
-              <div className="contact-direct-title">Direct Contact</div>
-              <a
-                className="contact-link"
-                href={contact.whatsapp}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                WhatsApp <span>Chat now</span>
-              </a>
-              <a className="contact-link" href={`tel:${contact.phone}`}>
-                Call <span>{contact.phone}</span>
-              </a>
-              <a className="contact-link" href={`mailto:${contact.email}`}>
-                Email <span>{contact.email}</span>
-              </a>
-              <a
-                className="contact-link"
-                href={contact.instagram}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Instagram <span>@sculptprotocol</span>
-              </a>
+                <div className="signup-form-row-split">
+                  <div className="signup-form-row">
+                    <label htmlFor="weight">Weight (kg)</label>
+                    <input id="weight" name="weight" type="number" step="0.1" inputMode="decimal" className="signup-input" placeholder="84" required />
+                  </div>
+                  <div className="signup-form-row">
+                    <label htmlFor="waist">Waist (in)</label>
+                    <input id="waist" name="waist" type="number" step="0.1" inputMode="decimal" className="signup-input" placeholder="36" required />
+                  </div>
+                </div>
+
+                <div className="signup-form-row">
+                  <label htmlFor="glute">Glute (in)</label>
+                  <input id="glute" name="glute" type="number" step="0.1" inputMode="decimal" className="signup-input" placeholder="44" required />
+                </div>
+
+                <div className="signup-form-row">
+                  <label htmlFor="note">Vital health notes or dietary constraints?</label>
+                  <textarea id="note" name="note" className="signup-textarea" placeholder="Injuries, specific timeline targets, or anomalies..." />
+                </div>
+
+                <button type="submit" className="signup-submit" disabled={submitting}>
+                  {submitting ? "Processing Baselines..." : "Establish Protocol Entry"}
+                  <span aria-hidden>→</span>
+                </button>
+
+                <p className="signup-fineprint">Secure verification submission.</p>
+
+                {error && <p className="signup-note-error">{error}</p>}
+                {success && <p className="signup-note-success">{success}</p>}
+              </form>
             </div>
           </div>
         </div>

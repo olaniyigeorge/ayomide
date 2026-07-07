@@ -1,3 +1,68 @@
+export const profile = {
+  name: "Ayomide",
+  fullName: "Ayomide Olaniyi",
+  travelDate: "2026-09-05",
+  photos: {
+    profile: "/images/after.jpg",
+    before: "/images/before.jpg",
+    after: "/images/after.jpg",
+  },
+  stats: [
+    { label: "Weight", current: 90, goal: 85, unit: "kg", direction: "down" as const },
+    { label: "Waist", current: 42, goal: 39, unit: "in", direction: "down" as const },
+    { label: "Glute", current: 44, goal: 45, unit: "in", direction: "up" as const },
+  ],
+};
+
+
+export const offerings = {
+  options: [
+    {
+      title: "Healthy Fat Loss Transformation",
+      icon: "🔥",
+      goal: "Lose weight & excess fat before your trip",
+      remark:
+        "We're going to focus on helping you drop excess fat in a healthy, sustainable way — without crash diets or pushing your body into exhaustion. The goal is to help you feel lighter, more confident, and closer to the body you want before your journey.",
+    },
+    {
+      title: "Slimmer Waist & Flat Tummy Focus",
+      icon: "✨",
+      goal: "Reduce belly fat & lose inches around your waist",
+      remark:
+        "We're going after that tummy area with the right combination of strength training, movement, and nutrition. The goal is to help you tighten your core, reduce inches around your waist, and create that flatter, more confident look you've been wanting.",
+    },
+    {
+      title: "Face Slimming & Body Definition",
+      icon: "💎",
+      goal: "Reveal a sharper, more defined look",
+      remark:
+        "As we reduce overall body fat, we'll work toward bringing out a more defined version of you — including helping reduce facial fullness and creating a leaner, more sculpted appearance while keeping you looking healthy and energized.",
+    },
+    {
+      title: "Glute Growth & Curves Sculpting",
+      icon: "🍑",
+      goal: "Build a rounder, stronger lower body",
+      remark:
+        "We're going to build and shape your glutes while creating the balance of a slimmer waist and stronger lower body. Through targeted workouts, we'll help your curves become more pronounced, lifted, and defined.",
+    },
+    {
+      title: "Toned Back & Full Body Sculpting",
+      icon: "💪",
+      goal: "Create a lean, toned physique",
+      remark:
+        "We'll strengthen and sculpt your back, shoulders, and full body to create that toned look you're aiming for. A stronger back, better posture, and improved muscle definition will help bring out your shape even more.",
+    },
+    {
+      title: "Personal Coaching & Flexible Nutrition",
+      icon: "🎯",
+      goal: "Transform without giving up the foods you love",
+      remark:
+        "I'll personally guide you throughout the process — helping you make progress without extreme restrictions. We'll create a plan that fits your lifestyle, lets you still enjoy your favourite foods, and helps you transform in a way you can actually maintain.",
+    },
+  ],
+};
+
+
 export const phases = [
   {
     numeral: "I",
@@ -136,19 +201,20 @@ export const reviews = [
     name: "Goody T.",
     tag: "Week 7 · Lagos",
     quote:
-      "This wasn't just workouts — it felt like a system. My lifestyle changed naturally without forcing extreme routines.",
+      "This wasn't just workouts - it felt like a system. My lifestyle changed naturally without forcing extreme routines.",
   },
 ];
 
 export const investment = {
   low: 120000,
   high: 150000,
+  note: "Because she deserves the real thing, not a generic plan off the internet - in-person sessions, adjusted week to week, right up to the day she boards that flight.",
   includes: [
-    "Personalized assessment",
+    "In-person training sessions",
     "Individualized progression plan",
-    "Structured coaching throughout",
+    "Hands-on form correction",
     "Nutritional guidance",
-    "Progress monitoring",
+    "Weekly measurement check-ins",
     "Accountability & ongoing support",
     "Performance-based adjustments",
   ],
@@ -163,6 +229,7 @@ export const goalOptions = [
 ];
 
 export const contact = {
+  coachName: "Olaniyi",
   whatsapp: "https://wa.me/2349037018310", // replace with real number
   phone: "+234 903 701 8310", // replace with real number
   email: "olaniyigeorge77@gmail.com", // replace with real email
