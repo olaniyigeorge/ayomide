@@ -119,7 +119,7 @@ export default function SculptProtocolPage() {
   return (
     <div className="sculpt">
       {/* ---------- NAVIGATION ---------- */}
-      <nav className="nav">
+      {/* <nav className="nav">
         <div className="wrap nav-row">
           <Link href="/ayo" className="nav-mark">
             Sculpt <span>Protocol</span>
@@ -128,7 +128,7 @@ export default function SculptProtocolPage() {
             Start Your Journey
           </a>
         </div>
-      </nav>
+      </nav> */}
 
       {/* ---------- HERO SECTION ---------- */}
       <header className="hero-photo">
@@ -141,11 +141,11 @@ export default function SculptProtocolPage() {
             <span className="hero-badge">🔥 Made Specially For You, Ayomide</span>
 
             <h1 className="hero-photo-title">
-              SCULPT THE <em>BEST</em>
+              THE  7 WEEK <em>BEST</em>
               <br />
-              VERSION OF
+              SCULPT
               <br />
-              YOURSELF
+              JOURNEY
             </h1>
 
             <p className="hero-photo-sub">
